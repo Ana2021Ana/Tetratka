@@ -1,0 +1,50 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib import animation
+
+
+def create_world(n):
+    return np.random.choice((1, 0), n * n, p=(0.2, 0.8)).reshape(n, n)
+
+
+def evolve_world(k, x, img):
+
+    n = np.int(np.sqrt(np.size(x)))
+    y = np.copy(x)
+
+    for i in range(n):
+        for j in range(n):
+
+            s = x[(i - 1) % n][(j - 1) % n] + x[(i - 1) % n][j] + x[(i - 1) % n][(j + 1) % n] \
+              + x[i][(j - 1) % n]                                         + x[i][(j + 1) % n] \
+              + x[(i + 1) % n][(j - 1) % n] + x[(i + 1) % n][j] + x[(i + 1) % n][(j + 1) % n]
+
+            if x[i][j] == 1:
+                if s == 2 or s == 3:
+                    y[i][j] = 1
+                else:
+                    y[i][j] = 0
+            else:
+                if s == 3:
+                    y[i][j] = 1
+                else:
+                    y[i][j] = 0
+
+    img.set_data(y)
+    x[:] = y[:]
+    return img
+
+
+def main():
+
+    n = 25
+    x = create_world(n)
+
+    fig, ax = plt.subplots()
+    img = ax.imshow(x)
+
+    evolution = animation.FuncAnimation(fig, evolve_world, interval=30, fargs=(x, img))
+    plt.show()
+
+
+main()
